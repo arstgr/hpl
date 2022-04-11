@@ -35,6 +35,7 @@ make arch=Linux
 
 cd $wdir
 cp $hpldir/bin/Linux/xhpl .
+
 cat <<EOF > HPL.dat
 HPLinpack benchmark input file
 Innovative Computing Laboratory, University of Tennessee
@@ -109,4 +110,6 @@ export BLIS_IR_NT=1
 numactl --membind=\$1 ./xhpl
 EOF
 
+chmod +x appfile_ccx
+chmod +x xhpl_ccx.sh
 
