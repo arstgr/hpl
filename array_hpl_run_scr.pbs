@@ -36,4 +36,4 @@ export mpi_options="--mca mpi_leave_pinned 1 --bind-to none --report-bindings --
 
 echo "Running on $(hostname)" > hpl-${PBS_ARRAY_INDEX}.log
 mpirun $mpi_options -app ./appfile_ccx  >> hpl-${PBS_ARRAY_INDEX}.log     
-echo "system: $(hostname) HPL: $(grep WR11 hpl*.log | awk -F ' ' '{print $7}')" >> ../hpl-test-results.log
+echo "system: $(hostname) HPL: $(grep WR hpl*.log | awk -F ' ' '{print $7}')" >> ../hpl-test-results.log
