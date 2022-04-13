@@ -110,6 +110,52 @@ export BLIS_IR_NT=1
 numactl --membind=\$1 ./xhpl
 EOF
 
+cat <<EOF > hpl_run_scr.sh
+#!/bin/bash
+wdir=$1
+
+#module load mpi/hpcx
+source /opt/hpcx-*-x86_64/hpcx-init.sh
+hpcx_load
+
+ulimit -s unlimited
+ulimit -l unlimited
+ulimit -a
+
+echo always | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
+echo always | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
+
+cd $wdir
+
+mkdir HPL-N1-96PPN.$(hostname)
+cd HPL-N1-96PPN.$(hostname)
+
+cp ../HPL.dat .
+cp ../appfile*_ccx .
+cp ../xhpl_ccx.sh .
+cp ../xhpl .
+
+export mpi_options="--mca mpi_leave_pinned 1 --bind-to none --report-bindings --mca btl self,vader --map-by ppr:1:l3cache -x OMP_NUM_THREADS=6 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH"
+
+echo "Running on $(hostname)" > hpl-$(hostname).log
+mpirun $mpi_options -app ./appfile_ccx  >> hpl-$(hostname).log
+echo "system: $(hostname) HPL: $(grep WR hpl*.log | awk -F ' ' '{print $7}')" >> ../hpl-test-results.log
+EOF
+
+cat <<EOF > hpl_pssh_script.sh
+#!/bin/bash
+export wdir=$(pwd)
+
+sudo yum install pssh -y
+
+pbsnodes -avS | grep free | awk -F ' ' '{print $1}' > hosts.txt
+pssh -p 194 -t 0 -i -h hosts.txt "cd $wdir && ./hpl_run_scr.sh $wdir" >> hpl_pssh.log 2>&1
+
+sleep 60
+EOF
+
 chmod +x appfile_ccx
 chmod +x xhpl_ccx.sh
+chmod +x hpl_run_scr.sh
+chmod +x hpl_pssh_script.sh
 
