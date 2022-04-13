@@ -7,6 +7,7 @@ module load gcc-9.2.0
 module load mpi/hpcx
 git clone https://github.com/flame/blis.git
 cd blis/
+git reset --hard ae10d9495486f589ed0320f0151b2d195574f1cf
 mkdir libblis
 libbls=$(pwd)/libblis
 sed -i 's/COPTFLAGS      := -O2/COPTFLAGS      := -O2 -Ofast -ffast-math -ftree-vectorize -funroll-loops -march=znver2/' config/amd64/make_defs.mk
