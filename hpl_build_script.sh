@@ -152,7 +152,7 @@ sudo yum install pssh -y
 pbsnodes -avS | grep free | awk -F ' ' '{print \$1}' > hosts.txt
 pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr.sh \$wdir" >> hpl_pssh.log 2>&1
 
-sleep 360
+sleep 600
 EOF
 
 chmod +x appfile_ccx
