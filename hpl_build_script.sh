@@ -154,7 +154,7 @@ echo "before pssh date: \$(date)"
 pbsnodes -avS | grep free | awk -F ' ' '{print \$1}' > hosts.txt
 pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr.sh \$wdir" >> hpl_pssh.log 2>&1
 
-sleep 1000
+sleep 60
 cat ./hpl-test-results.log > ./test.log
 echo "end of pssh date: \$(date)"
 EOF
