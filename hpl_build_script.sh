@@ -111,7 +111,7 @@ export BLIS_IR_NT=1
 numactl --membind=\$1 ./xhpl
 EOF
 
-cat <<EOF > hpl_run_scr.sh
+cat <<EOF > hpl_run_scr_hbv3.sh
 #!/bin/bash
 wdir=\$1
 
@@ -143,6 +143,36 @@ mpirun \$mpi_options -app ./appfile_ccx  >> hpl-\$(hostname).log
 echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
 EOF
 
+cat <<EOF > hpl_run_scr_hbv2.sh
+#!/bin/bash
+wdir=\$1
+
+#module load mpi/hpcx
+source /opt/hpcx-*-x86_64/hpcx-init.sh
+hpcx_load
+
+ulimit -s unlimited
+ulimit -l unlimited
+ulimit -a
+
+echo always | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
+echo always | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
+
+cd \$wdir
+
+mkdir HPL-N1-96PPN.\$(hostname)
+cd HPL-N1-96PPN.\$(hostname)
+
+cp ../HPL.dat .
+cp ../appfile*_ccx .
+cp ../xhpl_ccx.sh .
+cp ../xhpl .
+
+echo "Running on \$(hostname)" > hpl-\$(hostname).log
+mpirun -np 30 --report-bindings --mca btl self,vader --map-by ppr:1:l3cache:pe=4 -x OMP_NUM_THREADS=4 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH xhpl >> hpl-\$(hostname).log
+echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
+EOF
+
 cat <<EOF > hpl_pssh_script.sh
 #!/bin/bash
 export wdir=\$(pwd)
@@ -152,7 +182,12 @@ sudo yum install pssh -y
 echo "beginning date: \$(date)"
 
 pbsnodes -avS | grep free | awk -F ' ' '{print \$1}' > hosts.txt
-pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr.sh \$wdir" >> hpl_pssh.log 2>&1
+
+if [ "\${VM_SERIES}" == "hbrs_v3" ]; then
+	pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv3.sh \$wdir" >> hpl_pssh.log 2>&1
+elif [ "\${VM_SERIES}" == "hbrs_v2" ]; then
+	pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv2.sh \$wdir" >> hpl_pssh.log 2>&1
+fi
 
 sleep 60
 
@@ -162,6 +197,6 @@ EOF
 
 chmod +x appfile_ccx
 chmod +x xhpl_ccx.sh
-chmod +x hpl_run_scr.sh
+chmod +x hpl_run_scr_*.sh
 chmod +x hpl_pssh_script.sh
 
