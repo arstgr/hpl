@@ -168,6 +168,9 @@ cp ../appfile*_ccx .
 cp ../xhpl_ccx.sh .
 cp ../xhpl .
 
+sed -i "s/4           Ps/6           Ps/g" HPL.dat
+sed -i "s/4            Qs/5            Qs/g" HPL.dat
+
 echo "Running on \$(hostname)" > hpl-\$(hostname).log
 mpirun -np 30 --report-bindings --mca btl self,vader --map-by ppr:1:l3cache:pe=4 -x OMP_NUM_THREADS=4 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH xhpl >> hpl-\$(hostname).log
 echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
