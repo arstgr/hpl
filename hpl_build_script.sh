@@ -192,9 +192,9 @@ then
 fi
 
 if [ "\${VM_SERIES}" == "hbrs_v3" ]; then
-	pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv3.sh \$wdir" >> hpl_pssh.log 2>&1
+	pssh -p 800 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv3.sh \$wdir" >> hpl_pssh.log 2>&1
 elif [ "\${VM_SERIES}" == "hbrs_v2" ]; then
-	pssh -p 194 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv2.sh \$wdir" >> hpl_pssh.log 2>&1
+	pssh -p 800 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv2.sh \$wdir" >> hpl_pssh.log 2>&1
 fi
 
 sleep 60
