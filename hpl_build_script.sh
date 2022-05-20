@@ -199,7 +199,7 @@ fi
 
 sleep 60
 
-IFS=$'\n' read -d '' -r -a names < ./hosts.txt
+IFS=\$'\n' read -d '' -r -a names < ./hosts.txt
 for i in \${names[@]}; do
     echo "system: \$i HPL: \$(grep WR ./HPL-N1-96PPN.\$i/hpl*.log | awk -F ' ' '{print \$7}')" >> hpl-test-results.log
 done
