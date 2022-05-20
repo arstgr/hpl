@@ -140,7 +140,7 @@ export mpi_options="--mca mpi_leave_pinned 1 --bind-to none --report-bindings --
 
 echo "Running on \$(hostname)" > hpl-\$(hostname).log
 mpirun \$mpi_options -app ./appfile_ccx  >> hpl-\$(hostname).log
-echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
+#echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
 EOF
 
 cat <<EOF > hpl_run_scr_hbv2.sh
@@ -173,7 +173,7 @@ sed -i "s/4            Qs/5            Qs/g" HPL.dat
 
 echo "Running on \$(hostname)" > hpl-\$(hostname).log
 mpirun -np 30 --report-bindings --mca btl self,vader --map-by ppr:1:l3cache:pe=4 -x OMP_NUM_THREADS=4 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH xhpl >> hpl-\$(hostname).log
-echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
+#echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
 EOF
 
 cat <<EOF > hpl_pssh_script.sh
@@ -192,12 +192,17 @@ then
 fi
 
 if [ "\${VM_SERIES}" == "hbrs_v3" ]; then
-	pssh -p 800 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv3.sh \$wdir" >> hpl_pssh.log 2>&1
+	pssh -p 32 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv3.sh \$wdir" >> hpl_pssh.log 2>&1
 elif [ "\${VM_SERIES}" == "hbrs_v2" ]; then
-	pssh -p 800 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv2.sh \$wdir" >> hpl_pssh.log 2>&1
+	pssh -p 32 -t 0 -i -h hosts.txt "cd \$wdir && ./hpl_run_scr_hbv2.sh \$wdir" >> hpl_pssh.log 2>&1
 fi
 
 sleep 60
+
+IFS=$'\n' read -d '' -r -a names < ./hosts.txt
+for i in \${names[@]}; do
+    echo "system: \$i HPL: \$(grep WR ./HPL-N1-96PPN.\$i/hpl*.log | awk -F ' ' '{print \$7}')" >> hpl-test-results.log
+done
 
 echo "end date: \$(date)"
 
