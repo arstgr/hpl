@@ -188,7 +188,7 @@ echo \$(hostname) > hosts.txt
 
 if command -v pbsnodes --version &> /dev/null
 then
-	pbsnodes -avS | grep free | awk -F ' ' '{print \$1}' >> hosts.txt
+	pbsnodes -avS | grep free | awk -F ' ' '{print tolower(\$1)}' >> hosts.txt
 fi
 
 if [ "\${VM_SERIES}" == "hbrs_v3" ]; then
