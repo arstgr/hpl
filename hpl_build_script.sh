@@ -128,8 +128,8 @@ echo always | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
 
 cd \$wdir
 
-mkdir HPL-N1-96PPN.\$(hostname)
-cd HPL-N1-96PPN.\$(hostname)
+mkdir HPL-test.\$(hostname | tr "[:upper:]" "[:lower:]")
+cd HPL-test.\$(hostname | tr "[:upper:]" "[:lower:]")
 
 cp ../HPL.dat .
 cp ../appfile*_ccx .
@@ -138,9 +138,9 @@ cp ../xhpl .
 
 export mpi_options="--mca mpi_leave_pinned 1 --bind-to none --report-bindings --mca btl self,vader --map-by ppr:1:l3cache -x OMP_NUM_THREADS=6 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH"
 
-echo "Running on \$(hostname)" > hpl-\$(hostname).log
-mpirun \$mpi_options -app ./appfile_ccx  >> hpl-\$(hostname).log
-#echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
+echo "Running on \$(hostname | tr "[:upper:]" "[:lower:]")" > hpl-\$(hostname | tr "[:upper:]" "[:lower:]").log
+mpirun \$mpi_options -app ./appfile_ccx  >> hpl-\$(hostname | tr "[:upper:]" "[:lower:]").log
+#echo "system: \$(hostname | tr "[:upper:]" "[:lower:]") HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
 EOF
 
 cat <<EOF > hpl_run_scr_hbv2.sh
@@ -160,8 +160,8 @@ echo always | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
 
 cd \$wdir
 
-mkdir HPL-N1-96PPN.\$(hostname)
-cd HPL-N1-96PPN.\$(hostname)
+mkdir HPL-test.\$(hostname | tr "[:upper:]" "[:lower:]")
+cd HPL-test.\$(hostname | tr "[:upper:]" "[:lower:]")
 
 cp ../HPL.dat .
 cp ../appfile*_ccx .
@@ -171,9 +171,9 @@ cp ../xhpl .
 sed -i "s/4           Ps/6           Ps/g" HPL.dat
 sed -i "s/4            Qs/5            Qs/g" HPL.dat
 
-echo "Running on \$(hostname)" > hpl-\$(hostname).log
-mpirun -np 30 --report-bindings --mca btl self,vader --map-by ppr:1:l3cache:pe=4 -x OMP_NUM_THREADS=4 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH xhpl >> hpl-\$(hostname).log
-#echo "system: \$(hostname) HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
+echo "Running on \$(hostname | tr "[:upper:]" "[:lower:]")" > hpl-\$(hostname | tr "[:upper:]" "[:lower:]").log
+mpirun -np 30 --report-bindings --mca btl self,vader --map-by ppr:1:l3cache:pe=4 -x OMP_NUM_THREADS=4 -x OMP_PROC_BIND=TRUE -x OMP_PLACES=cores -x LD_LIBRARY_PATH xhpl >> hpl-\$(hostname | tr "[:upper:]" "[:lower:]").log
+#echo "system: \$(hostname | tr "[:upper:]" "[:lower:]") HPL: \$(grep WR hpl*.log | awk -F ' ' '{print \$7}')" >> ../hpl-test-results.log
 EOF
 
 cat <<EOF > hpl_pssh_script.sh
@@ -184,7 +184,7 @@ sudo yum install pssh -y
 
 echo "beginning date: \$(date)"
 
-echo \$(hostname) > hosts.txt
+echo \$(hostname | tr "[:upper:]" "[:lower:]") > hosts.txt
 
 if command -v pbsnodes --version &> /dev/null
 then
@@ -201,7 +201,7 @@ sleep 60
 
 IFS=\$'\n' read -d '' -r -a names < ./hosts.txt
 for i in \${names[@]}; do
-    echo "system: \$i HPL: \$(grep WR ./HPL-N1-96PPN.\$i/hpl*.log | awk -F ' ' '{print \$7}')" >> hpl-test-results.log
+    echo "system: \$i HPL: \$(grep WR ./HPL-test.\$i/hpl*.log | awk -F ' ' '{print \$7}')" >> hpl-test-results.log
 done
 
 echo "end date: \$(date)"
