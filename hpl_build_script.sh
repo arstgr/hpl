@@ -71,10 +71,8 @@ HPL.out      output file name (if any)
 8            memory alignment in double (> 0)
 EOF
 
-<<<<<<< HEAD
-
 chmod +x appfile_ccx*
-=======
+
 cat <<EOF > appfile_ccx
 -np 1 ./xhpl_ccx.sh 0 0-5 6
 -np 1 ./xhpl_ccx.sh 0 8-13 6
@@ -213,7 +211,6 @@ echo "end date: \$(date)"
 EOF
 
 chmod +x appfile_ccx
->>>>>>> 5f833d4bd55b3eb4d6b5ad7722772ba4b95a16d0
 chmod +x xhpl_ccx.sh
 chmod +x hpl_run_scr_*.sh
 chmod +x hpl_pssh_script.sh
